@@ -1,0 +1,22 @@
+{
+  "name": "happybara",
+  "version": "1.0.0",
+  "description": "Write Ruby <-> JavaScript tests.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amireh/happybara.git"
+  },
+  "author": "Ahmad Amireh",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/amireh/happybara/issues"
+  },
+  "homepage": "https://github.com/amireh/happybara#readme",
+  "devDependencies": {
+    "babel-eslint": "6.1.2"
+  }
+}
