@@ -1,6 +1,6 @@
 module Happybara
   class ServerConfigurator
-    attr_accessor :executor
+    attr_accessor :executor, :agent
 
     def initialize(server)
       @server = server
@@ -38,7 +38,13 @@ module Happybara
       case stage
       when :before_all, :after_all, :before_each, :after_each
         @suite_configuration_blocks[stage].each do |callback|
-          callback.call(*args)
+          begin
+            callback.call(*args)
+          rescue Exception => e
+            puts "Callback failure for stage '#{stage}'"
+            puts e.message
+            puts e.backtrace
+          end
         end
       else
         fail "InternalError: unknown stage '#{stage}' to invoke!"

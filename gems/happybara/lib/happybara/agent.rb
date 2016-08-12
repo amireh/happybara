@@ -1,4 +1,4 @@
-require 'database_cleaner'
+# require 'database_cleaner'
 require_relative './serializer'
 
 module Happybara
@@ -10,25 +10,7 @@ module Happybara
 
     def bind(socket)
       socket.onmessage do |payload, type|
-        begin
-          handle_message(socket, payload, type)
-        rescue StandardError => e
-          puts "#{'=' * 80}\nHandler error!\n#{'-' * 80}"
-          puts e.message
-          puts e.backtrace
-        end
-      end
-
-      socket.onopen do
-        puts "JavaScript client connected"
-      end
-
-      socket.onerror do |error|
-        puts "Error occurred: #{error}"
-      end
-
-      socket.onclose do
-        puts "JavaScript client disconnected"
+        handle_message(socket, payload, type)
       end
     end
 
@@ -46,11 +28,21 @@ module Happybara
         }.to_json, { type: payload_type })
       }
 
-      case message['type']
-      when 'RPC'
-        handle_rpc(message, &respond)
-      else
-        respond['error', { details: "unknown message type #{message['type']}" }]
+      begin
+        case message['type']
+        when 'RPC'
+          handle_rpc(message, &respond)
+        when 'EVAL'
+          handle_eval(message, &respond)
+        else
+          fail "unknown message type #{message['type']}"
+        end
+      rescue StandardError => e
+        puts "#{'=' * 80}\nHandler error!\n#{'-' * 80}"
+        puts e.message
+        puts e.backtrace
+
+        respond['error', { details: e.message, backtrace: e.backtrace }]
       end
     end
 
@@ -68,6 +60,21 @@ module Happybara
       else
         respond['error', { details: "unknown RPC #{method_name}" }]
       end
+    end
+
+    def handle_eval(message, &respond)
+      string = message['data']['string']
+      options = message['data']['options'] || {}
+
+      within_tenant(options['tenant']) do
+        begin
+          rc = eval(string)
+          respond['EVAL_RESPONSE', @serializer.serialize(rc)]
+        rescue StandardError => e
+          respond['error', { details: e.message }]
+        end
+      end
+
     end
 
     def within_tenant(tenant, &block)

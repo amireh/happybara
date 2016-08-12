@@ -2,10 +2,8 @@ PATH
   remote: .
   specs:
     happybara (1.0.0)
-      database_cleaner (~> 1.5.3)
       rails (>= 4, < 6)
-      websocket (~> 1.2.3)
-      websocket-eventmachine-server (~> 1.0.1)
+      websocket-driver
 
 GEM
   remote: https://rubygems.org/
@@ -51,7 +49,6 @@ GEM
     builder (3.2.2)
     coderay (1.1.1)
     concurrent-ruby (1.0.2)
-    database_cleaner (1.5.3)
     diff-lcs (1.2.5)
     erubis (2.7.0)
     eventmachine (1.2.0.1)
@@ -129,22 +126,15 @@ GEM
     thread_safe (0.3.5)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
-    websocket (1.2.3)
     websocket-driver (0.6.4)
       websocket-extensions (>= 0.1.0)
-    websocket-eventmachine-base (1.2.0)
-      eventmachine (~> 1.0)
-      websocket (~> 1.0)
-      websocket-native (~> 1.0)
-    websocket-eventmachine-server (1.0.1)
-      websocket-eventmachine-base (~> 1.0)
     websocket-extensions (0.1.2)
-    websocket-native (1.0.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  eventmachine
   happybara!
   pry
   rake (~> 10.0)

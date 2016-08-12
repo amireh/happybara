@@ -1,31 +1,14 @@
 {
-  "parser": "babel-eslint",
-  "env": {
-    "browser": true,
-    "mocha": true,
-    "node": true
-  },
-
-  "plugins": [ "react" ],
+  "env": { "browser": true },
 
   "parserOptions": {
     "sourceType": "module",
-    "ecmaVersion": 6,
-    "ecmaFeatures": {
-      "jsx": true,
-      "modules": true,
-    }
+    "ecmaVersion": 6
   },
 
   "rules": {
     "no-undef": 2,
-    "no-unused-vars": 2,
-    "no-shadow": 2,
-
-    "react/jsx-uses-react": 2,
-    "react/jsx-no-undef": 2,
-    "react/jsx-uses-vars": 2,
-    "react/react-in-jsx-scope": 2,
+    "no-unused-vars": 2
   },
 
   "globals": {
