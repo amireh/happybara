@@ -1,4 +1,4 @@
-import RubyRPCAgent from '../RubyRPCAgent';
+import RubyRPCAgent from './RubyRPCAgent';
 
 const SilentConsole = {
   debug: Function.prototype,
@@ -30,7 +30,7 @@ export default class RubyRPC {
    * You can invoke it using the same identifier:
    *
    * ```javascript
-   * execRuby('a_user', { name: 'Xi' });
+   * exec('a_user', { name: 'Xi' });
    * // => { id: 1, name: 'Xi', password: '123' }
    * ```
    *
@@ -43,15 +43,15 @@ export default class RubyRPC {
    * @return {Promise.<Object>}
    *         Fulfills with either the return value of the function or an error.
    */
-  async execRuby(procedure, payload, options) {
+  async exec(procedure, payload, options) {
     return this.agent.send(procedure, payload, options);
   }
 
-  async evalRuby(string, options) {
+  async eval(string, options) {
     return this.agent.eval(string, options);
   }
 
-  connectToRails() {
+  connect() {
     return this.agent.connect();
   }
 
@@ -59,7 +59,7 @@ export default class RubyRPC {
     return this.agent.isConnected();
   }
 
-  disconnectFromRails() {
+  disconnect() {
     return this.agent.disconnect();
   }
 }

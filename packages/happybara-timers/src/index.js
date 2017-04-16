@@ -8,7 +8,6 @@ const {
 } = window;
 
 export default class HappybaraTimersCapability {
-  /** @private */
   clearTimers() {
     let i;
 

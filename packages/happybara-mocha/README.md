@@ -1,4 +1,4 @@
-# happybara-adapter-mocha
+# happybara-mocha
 
 A Mocha adapter for Happybara sessions that instantiates a session for your
 regression suite.

@@ -1,7 +1,9 @@
-# happybara-plugin-pagejs
+# happybara-timers
 
-Clean up zombie timers in your Happybara Session. This plugin will make sure
-the following timers are properly cleaned up so that the tests won't bleed:
+Clean up zombie timers in your Happybara Session.
+
+This plugin will make sure the following timers are properly cleaned up so that
+the tests won't bleed:
 
 - `window.setTimeout`
 - `window.setInterval`

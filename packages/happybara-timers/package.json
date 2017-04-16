@@ -1,0 +1,15 @@
+{
+  "name": "happybara-plugin-timers",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amireh/happybara.git"
+  },
+  "author": "Ahmad Amireh",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/amireh/happybara/issues"
+  },
+  "homepage": "https://github.com/amireh/happybara#readme"
+}

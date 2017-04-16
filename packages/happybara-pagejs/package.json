@@ -1,11 +1,7 @@
 {
-  "name": "happybara",
+  "name": "happybara-pagejs",
   "version": "1.0.0",
-  "description": "Write Ruby <-> JavaScript tests.",
   "main": "src/index.js",
-  "scripts": {
-    "test": "mocha"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/amireh/happybara.git"
@@ -17,9 +13,7 @@
   },
   "homepage": "https://github.com/amireh/happybara#readme",
   "peerDependencies": {
-    "chai": ""
-  },
-  "dependencies": {
-    "invariant": "2.2.2"
+    "page": "^1.7",
+    "happybara": "^1.0.0"
   }
 }

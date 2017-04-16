@@ -1,4 +1,4 @@
-# happybara-plugin-pagejs
+# happybara-pagejs
 
 Upgrade your Happybara Session with
 [page.js](https://visionmedia.github.io/page.js/)-powered routing capabilities.
