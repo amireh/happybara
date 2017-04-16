@@ -1,6 +1,6 @@
 {
   "name": "happybara-ruby",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "main": "src/index.js",
   "repository": {
     "type": "git",
@@ -13,7 +13,7 @@
   },
   "homepage": "https://github.com/amireh/happybara#readme",
   "peerDependencies": {
-    "chai": ""
+    "chai": "^2 || ^3"
   },
   "dependencies": {
     "invariant": "2.2.2"
