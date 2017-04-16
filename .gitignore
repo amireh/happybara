@@ -1,3 +1,4 @@
 /examples/*/log
 /examples/*/tmp
 /examples/*/bin
+node_modules
