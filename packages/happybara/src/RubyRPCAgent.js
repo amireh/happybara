@@ -1,132 +1,155 @@
 import { assert } from 'chai';
+import Promise from 'Promise';
+import Channel from './RubyRPCChannel';
+import * as Reflection from './RubyReflection';
 
-let messageCount = 0;
+let channelCount = 0;
 
-function RubyRPCAgent(options) {
-  this.socket = null;
-  this.callbacks = [];
-  this.host = consume('host') || 'localhost';
-  this.port = consume('port') || '11142';
-  this.defaultOptions = options;
+class RubyRPCAgent {
+  constructor(userOptions) {
+    const options = Object.assign({}, userOptions);
 
-  function consume(key) {
-    if (options.hasOwnProperty(key)) {
-      const value = options[key];
-      delete options[key];
+    this.socket = null;
+    this.channel = null;
+    this.host = consume('host') || 'localhost';
+    this.port = consume('port') || '11141';
+    this.reflections = consume('reflections') || [];
+    this.logger = consume('logger') || console;
+    this.remoteOptions = options;
+    this.reflectedKlasses = {};
 
-      return value;
+    function consume(key) {
+      if (options.hasOwnProperty(key)) {
+        const value = options[key];
+        delete options[key];
+
+        return value;
+      }
+    }
+  }
+
+  connect() {
+    return new Promise((resolve, reject) => {
+      assert(!this.socket, "A connection has already been created!");
+
+      this.logger.debug(`Happybara: connecting to ws://${this.host}:${this.port}/...`);
+
+      this.socket = new WebSocket(`ws://${this.host}:${this.port}/happybara`);
+      this.socket.onerror = event => {
+        this.logger.error(event);
+
+        reject(new Error("Unable to connect to Happybara server"));
+      };
+
+      this.socket.onopen = () => {
+        this.channel = new Channel({
+          id: `${++channelCount}`,
+          logger: this.logger,
+          socket: this.socket
+        });
+
+        this.socket.onerror = null;
+        this.socket.onmessage = this.channel.handleMessage.bind(this.channel);
+
+        this.logger.debug('Happybara: connected.');
+
+        this.channel.send('SETUP', {}).then(() => {
+          this._queryReflectableClasses().then(resolve, error => {
+            this.logger.warn('Unable to query reflectable types:', error);
+            resolve();
+          });
+        }, reject);
+
+      };
+    });
+  }
+
+  isConnected() {
+    return !!this.channel;
+  }
+
+  _queryReflectableClasses() {
+    return Promise.all(this.reflections.map(klassName => {
+      return this._queryReflectableClass(klassName);
+    }));
+  }
+
+  _queryReflectableClass(klassName) {
+    return this.channel.send('QUERY', {
+      klass_name: klassName
+    }).then(data => {
+      this.reflectedKlasses[klassName] = Reflection.createFor(klassName, {
+        agent: this,
+        instanceMethods: data.instance_methods,
+      });
+    });
+  }
+
+  disconnect() {
+    return new Promise(resolve => {
+      if (this.socket) {
+        const closeSocket = () => {
+          this.socket.onclose = (/*closeEvent*/) => {
+            console.debug('SOCKET closed !');
+            this.channel = null;
+
+            resolve();
+          };
+
+          this.socket.close();
+          this.socket = null;
+        };
+
+        const closeSession = () => {
+          if (!this.channel) {
+            return Promise.resolve();
+          }
+          else {
+            return this.channel.send('TEARDOWN', {});
+          }
+        };
+
+        closeSession().then(() => {
+          console.debug('OK, tore down the session remotely, now closing socket...');
+          closeSocket();
+        }, () => {
+          console.warn("Unable to cleanly disconnect from server... terminating socket session.");
+
+          closeSocket();
+        });
+
+      }
+      else {
+        resolve();
+      }
+    });
+  }
+
+  send(procedure, payload, options) {
+    return this.channel.send('RPC', {
+      procedure,
+      payload,
+      options: Object.assign({}, this.remoteOptions, options),
+    }).then(this._reflect.bind(this));
+  }
+
+  eval(string, options) {
+    return this.channel.send('EVAL', {
+      string,
+      options: Object.assign({}, this.remoteOptions, options),
+    }).then(this._reflect.bind(this));
+  }
+
+  _reflect(response) {
+    const klass = this.reflectedKlasses[response.klass];
+
+    if (klass) {
+      return new klass(response.object_id, response.value);
+    }
+    else {
+      return response.value;
     }
   }
 }
-
-RubyRPCAgent.prototype.connect = function() {
-  return new Promise((resolve, reject) => {
-    assert(!this.socket, "A connection has already been created!");
-
-    console.log(`Happybara: connecting to ws://${this.host}:${this.port}/...`);
-
-    this.socket = new WebSocket(`ws://${this.host}:${this.port}/`);
-    this.socket.onerror = function(event) {
-      console.log(event);
-      reject("Unable to connect");
-    };
-
-    this.socket.onmessage = this.handleMessage.bind(this);
-    this.socket.onopen = () => {
-      this.socket.onerror = null;
-
-      console.log('Happybara: connected.');
-
-      resolve();
-    };
-  });
-};
-
-RubyRPCAgent.prototype.disconnect = function() {
-  return new Promise(resolve => {
-    if (this.socket) {
-      this.socket.onclose = function(/*closeEvent*/) {
-        resolve();
-      };
-
-      this.socket.close();
-      this.socket = null;
-    }
-    else {
-      resolve();
-    }
-  });
-};
-
-RubyRPCAgent.prototype.send = function(procedure, payload, options) {
-  const messageId = `message-${++messageCount}`;
-
-  this.socket.send(JSON.stringify({
-    id: messageId,
-    type: 'RPC',
-    data: {
-      procedure,
-      payload,
-      options: Object.assign({}, this.defaultOptions, options),
-    }
-  }));
-
-  return new Promise((resolve, reject) => {
-    console.log('Happybara: RPC request:', messageId, procedure);
-
-    this.callbacks[messageId] = [ resolve, reject, new Date() ];
-  });
-};
-
-RubyRPCAgent.prototype.eval = function(string, options) {
-  const messageId = `message-${++messageCount}`;
-
-  this.socket.send(JSON.stringify({
-    id: messageId,
-    type: 'EVAL',
-    data: {
-      string,
-      options: Object.assign({}, this.defaultOptions, options),
-    }
-  }));
-
-  return new Promise((resolve, reject) => {
-    console.log('Happybara: EVAL request:', messageId, string);
-
-    this.callbacks[messageId] = [ resolve, reject, new Date() ];
-  });
-};
-
-RubyRPCAgent.prototype.handleMessage = function(event) {
-  const message = JSON.parse(event.data);
-  const messageId = message.id;
-  const { data } = message;
-  const callback = this.callbacks[messageId];
-  const elapsed = (new Date()) - callback[2];
-
-  assert(!!callback, `Unknown message received: ${messageId}`);
-
-  if (message.type === 'error') {
-    const error = new Error(data.details);
-    error.name = 'RemoteError';
-
-    callback[1](error);
-  }
-  else if (message.type === 'EVAL_RESPONSE') {
-    console.log(`(${elapsed}ms) Happybara: EVAL response:`, messageId);
-    console.debug(data);
-
-    callback[0](data);
-  }
-  else if (message.type === 'RPC_RESPONSE') {
-    console.log(`(${elapsed}ms) Happybara: RPC response:`, messageId);
-    console.debug(data);
-
-    callback[0](data);
-  }
-  else {
-    console.warn(`Happybara: unknown message type "${message.type}"`);
-  }
-};
 
 export default RubyRPCAgent;
