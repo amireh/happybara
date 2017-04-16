@@ -1,6 +1,6 @@
 {
   "name": "happybara-pagejs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "src/index.js",
   "repository": {
     "type": "git",
@@ -13,7 +13,7 @@
   },
   "homepage": "https://github.com/amireh/happybara#readme",
   "peerDependencies": {
-    "page": "^1.7",
-    "happybara": "^1.0.0"
+    "happybara": "^1.0.0",
+    "page": "^1.7"
   }
 }
