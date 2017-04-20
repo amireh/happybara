@@ -15,6 +15,7 @@ export default class HappybaraReactCapability {
       container: null,
       inspectionNoticeContainer: null,
       confirmations: [],
+      confirmationPromptCount: 0,
     };
   }
 
@@ -32,6 +33,10 @@ export default class HappybaraReactCapability {
 
   getPendingConfirmationCount() {
     return this.state.confirmations.length;
+  }
+
+  getConfirmationCount() {
+    return this.state.confirmationPromptCount;
   }
 
   rejectUpcomingConfirmation() {
@@ -61,6 +66,8 @@ export default class HappybaraReactCapability {
         "acceptUpcomingConfirmation() or rejectUpcomingConfirmation()?"
       );
 
+      this.state.confirmationPromptCount += 1;
+
       return confirmation.result;
     };
   }
@@ -69,6 +76,7 @@ export default class HappybaraReactCapability {
     window.confirm = confirm;
 
     this.state.confirmations.splice(0);
+    this.state.confirmationPromptCount = 0;
 
     this.restoreRenderFn();
     this.state.component = null;

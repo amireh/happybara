@@ -2,3 +2,7 @@
 /examples/*/tmp
 /examples/*/bin
 node_modules
+/doc
+/gems/happybara/doc/
+/.yardoc
+lerna-debug.log

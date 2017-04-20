@@ -90,7 +90,6 @@ class RubyRPCAgent {
       if (this.socket) {
         const closeSocket = () => {
           this.socket.onclose = (/*closeEvent*/) => {
-            console.debug('SOCKET closed !');
             this.channel = null;
 
             resolve();
@@ -110,10 +109,9 @@ class RubyRPCAgent {
         };
 
         closeSession().then(() => {
-          console.debug('OK, tore down the session remotely, now closing socket...');
           closeSocket();
         }, () => {
-          console.warn("Unable to cleanly disconnect from server... terminating socket session.");
+          this.logger.warn("Unable to cleanly disconnect from server... terminating socket session.");
 
           closeSocket();
         });
