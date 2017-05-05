@@ -1,6 +1,6 @@
 {
   "name": "happybara-timers",
-  "version": "1.0.2",
+  "version": "1.0.7",
   "main": "src/index.js",
   "repository": {
     "type": "git",
