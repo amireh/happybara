@@ -84,15 +84,24 @@ export default class HappybaraReactCapability {
     if (this.state.container) {
       ReactDOM.unmountComponentAtNode(this.state.container);
 
-      this.state.container.remove();
+      removeNode(this.state.container);
       this.state.container = null;
     }
 
     if (this.state.inspectionNoticeContainer) {
       ReactDOM.unmountComponentAtNode(this.state.inspectionNoticeContainer);
 
-      this.state.inspectionNoticeContainer.remove();
+      removeNode(this.state.inspectionNoticeContainer);
       this.state.inspectionNoticeContainer = null;
     }
+  }
+}
+
+function removeNode(node) {
+  if (typeof node.remove === 'function') {
+    node.remove();
+  }
+  else {
+    node.parentNode.removeChild(node);
   }
 }

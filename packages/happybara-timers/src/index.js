@@ -11,20 +11,20 @@ export default class HappybaraTimersCapability {
   clearTimers() {
     let i;
 
-    const timerCount = setTimeout(function() {});
-    const intervalCount = setInterval(function() {});
-    const rafCount = requestAnimationFrame(function() {});
+    const timerCount = setTimeout.call(window, function() {});
+    const intervalCount = setInterval.call(window, function() {});
+    const rafCount = requestAnimationFrame.call(window, function() {});
 
     for (i = 0; i <= timerCount; ++i) {
-      clearTimeout(i);
+      clearTimeout.call(window, i);
     }
 
     for (i = 0; i <= intervalCount; ++i) {
-      clearInterval(i);
+      clearInterval.call(window, i);
     }
 
     for (i = 0; i <= rafCount; ++i) {
-      cancelAnimationFrame(i);
+      cancelAnimationFrame.call(window, i);
     }
   }
 }
