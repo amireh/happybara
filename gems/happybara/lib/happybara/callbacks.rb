@@ -15,6 +15,8 @@ module Happybara
       case stage.to_sym
       when :each
         on(:after_each, &callback)
+      when :all
+        at_exit(&callback)
       else
         fail "Unknown :after stage '#{stage}'"
       end
