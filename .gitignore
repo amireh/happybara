@@ -6,3 +6,4 @@ node_modules
 /gems/happybara/doc/
 /.yardoc
 lerna-debug.log
+*.gem
