@@ -21,5 +21,6 @@ EOF
   spec.require_paths = ["lib"]
 
   spec.add_runtime_dependency 'rails', [ '>= 5', '< 6' ]
+  spec.add_runtime_dependency 'colorize'
   spec.add_development_dependency 'rspec', '~> 3.5'
 end
